@@ -7,17 +7,16 @@ const helmet = require('helmet'); // seguridad para las cabeceras HTTP
 // inicializamos la app 
 const app = express();
 
-// rutas 
-const routes = require('./routes');
-app.use('/api', routes);
-
 //middlewares para leeer json(APIS)
 app.use(express.json());
 app.use(cors()); // seguridad basica 
 app.use(helmet());
 
+// rutas 
+const routes = require('./routes');
+app.use('/api', routes);
+
 //ruta de prueba 
-app.use(express.json());
 app.get('/', (req, res) => {
     res.send('API funcionando');
 });

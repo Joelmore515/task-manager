@@ -1,23 +1,25 @@
 const bcrypt = require('bcrypt');
-const {User} = require('../models');
-const generarToken = require('../utils/jwt');
+const User = require('../models/Users');
+const jwt = require('jsonwebtoken');
+
 
 // Registro
 exports.register = async (req, res) => {
     try{
         const {username, email, password} = req.body;
         // encriptamos la contraseña 
-        const hash = await bcrypt.hash(password, 10);
+        const hashPassword = await bcrypt.hash(password, 10);
         // crear al usuario 
         const user = await User.create({
             username,
             email,
-            password: hash
+            password: hashPassword,
         });
        
-        res.json({user});
+        res.json({message:"Usuario creado correctamente"});
     } catch (error) {
-        res.status(500).json({error:error.message});
+        console.log(error);
+        res.status(500).json({error:"Error al registrar"},error.message);
 
     }
 };
@@ -39,9 +41,13 @@ exports.login = async (req, res) => {
         }
 
         // generar token 
-        const token = generarToken(user);
+        const token = jwt.sign({
+            id:user.id},
+            "secreto",
+            {expiresIn:'1h'}       
+        );
         res.json({token});
     } catch (error) {
-        res.status(500).json({error:error.message});
+        res.status(500).json({error:"Error en el login"}, error.message);
     }
 }
